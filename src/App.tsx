@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./App.css";
-import { CoordinatePicker, Measure, Point, RightClick, Viewer } from "./cesium";
+import {
+  CoordinatePicker,
+  Measure,
+  Point,
+  RightClick,
+  SubscriptionProvider,
+  Viewer,
+} from "./cesium";
 import { Cartesian3 } from "cesium";
+import { CoordinatesUI } from "./ui";
 
 function App() {
   const [isActive, setIsActive] = useState(false);
@@ -22,32 +30,15 @@ function App() {
 
   return (
     <div className="relative flex flex-col bg-gray-800 h-full">
-      <div className="absolute z-10 p-8 bg-red-400 flex flex-col items-start">
-        <label className="flex gap-4">
-          AÇ KAPA
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
-          />
-        </label>
-        <div>METRE: {measureDistance.toFixed(2)}</div>
-        {/* <hr />
-        KOORDİNATLAR
-        {points.map((point, index) => (
-          <div className="flex gap-4 items-center my-1">
-            Coord ({index + 1})
-            <button className="bg-white text-yellow-900 px-1 py-1">GİT</button>
-          </div>
-        ))} */}
-      </div>
-      <Viewer>
-        <RightClick onRightClick={onRightClick} />
-        <CoordinatePicker onClick={onAddPoint}></CoordinatePicker>
-        {points.map((p, i) => (
-          <Point key={i} coordinate={p} />
-        ))}
-        {/* <Point
+      <SubscriptionProvider>
+
+        <Viewer>
+          <RightClick onRightClick={onRightClick} />
+          <CoordinatePicker onClick={onAddPoint}></CoordinatePicker>
+          {points.map((p, i) => (
+            <Point key={i} id={`point-${i}`} coordinate={p} />
+          ))}
+          {/* <Point
           pixelSize={50}
           coordinate={
             {
@@ -57,15 +48,31 @@ function App() {
             } as any
           }
         /> */}
-      </Viewer>
-      <Viewer>
-        {/* {points.map((p, i) => (
+        </Viewer>
+        <Viewer>
+          {/* {points.map((p, i) => (
           <Point key={i} coordinate={p} pixelSize={24} />
         ))} */}
-        {isActive && (
-          <Measure coordinates={points} onChange={setMeasureDistance} />
-        )}
-      </Viewer>
+          {isActive && (
+            <Measure coordinates={points} onChange={setMeasureDistance} />
+          )}
+        </Viewer>
+
+        <div className="absolute z-10 p-8 bg-red-400 flex flex-col items-start">
+          <label className="flex gap-4">
+            AÇ KAPA
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+            />
+          </label>
+          <div>METRE: {measureDistance.toFixed(2)}</div>
+          <hr />
+
+          <CoordinatesUI points={points} />
+        </div>
+      </SubscriptionProvider>
     </div>
   );
 }
